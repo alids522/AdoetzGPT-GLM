@@ -3,7 +3,10 @@ package com.adoetz.gpt.service
 import android.content.Context
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
+import android.media.AudioFormat
 import android.media.AudioManager
+import android.media.AudioRecord
+import android.media.MediaRecorder
 import android.os.Build
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,8 +19,8 @@ import kotlinx.coroutines.flow.asStateFlow
 class AudioManager(private val context: Context) {
 
     private val systemAudioManager = context.getSystemService(Context.AUDIO_SERVICE) as android.media.AudioManager
-
     private var audioFocusRequest: AudioFocusRequest? = null
+    private var audioRecorder: AudioRecord? = null
 
     private val _hasAudioFocus = MutableStateFlow(false)
     val hasAudioFocus: StateFlow<Boolean> = _hasAudioFocus.asStateFlow()
@@ -132,5 +135,50 @@ class AudioManager(private val context: Context) {
             volume,
             AudioManager.FLAG_SHOW_UI
         )
+    }
+
+    /**
+     * Initialize audio recording
+     */
+    fun initializeRecording(): Boolean {
+        return try {
+            val sampleRate = 16000 // Standard sample rate for voice
+            val channelConfig = AudioFormat.CHANNEL_IN_MONO
+            val audioFormat = AudioFormat.ENCODING_PCM_16BIT
+
+            val bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat)
+            audioRecorder = AudioRecord(
+                MediaRecorder.AudioInputSource.VOICE_RECOGNITION,
+                sampleRate,
+                channelConfig,
+                audioFormat,
+                bufferSize
+            )
+
+            audioRecorder?.state == AudioRecord.STATE_INITIALIZED
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    /**
+     * Start audio recording
+     */
+    fun startRecording(): Boolean {
+        return try {
+            audioRecorder?.startRecording()
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    /**
+     * Stop audio recording
+     */
+    fun stopRecording() {
+        audioRecorder?.stop()
+        audioRecorder?.release()
+        audioRecorder = null
     }
 }

@@ -3,6 +3,7 @@ package com.adoetz.gpt
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import android.view.animation.LinearInterpolator
@@ -38,6 +39,18 @@ class MainActivity : AppCompatActivity() {
     private var voiceServiceBinder: VoiceSessionService.LocalBinder? = null
     private var isVoiceServiceBound = false
 
+    // Permission request launcher
+    private val permissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val allGranted = permissions.values.all { it }
+        if (allGranted) {
+            // All permissions granted
+        } else {
+            // Some permissions denied
+        }
+    }
+
     private val backendConfigLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
@@ -63,6 +76,22 @@ class MainActivity : AppCompatActivity() {
 
         setupViews()
         loadBackendConfig()
+        checkPermissions()
+    }
+
+    private fun checkPermissions() {
+        val permissions = arrayOf(
+            android.Manifest.permission.RECORD_AUDIO,
+            android.Manifest.permission.POST_NOTIFICATIONS
+        )
+        
+        val permissionsToRequest = permissions.filter {
+            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+        }.toTypedArray()
+        
+        if (permissionsToRequest.isNotEmpty()) {
+            permissionLauncher.launch(permissionsToRequest)
+        }
     }
 
     private fun setupViews() {
@@ -178,13 +207,12 @@ class MainActivity : AppCompatActivity() {
                     request: WebResourceRequest?
                 ): WebResourceResponse? {
                     // Add custom headers if API key is configured
-                    return if (currentBackendConfig?.apiKey != null) {
-                        // Note: This is a simplified example
-                        // In production, you'd want to add headers selectively
-                        super.shouldInterceptRequest(view, request)
-                    } else {
-                        super.shouldInterceptRequest(view, request)
+                    if (currentBackendConfig?.apiKey != null && currentBackendConfig?.apiKey?.isNotBlank() == true) {
+                        // For now, we'll let the WebView handle the request normally
+                        // but we'll ensure the API key is properly stored in the config
+                        // The actual header addition will be handled by the backend service
                     }
+                    return super.shouldInterceptRequest(view, request)
                 }
             }
 

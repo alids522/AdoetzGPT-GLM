@@ -82,11 +82,16 @@ class BackendConfigActivity : AppCompatActivity() {
 
     private fun loadCurrentConfig() {
         lifecycleScope.launch {
-            configManager.backendConfigFlow.collect { config ->
-                currentConfig = config
-                binding.etBackendUrl.setText(config.baseUrl)
-                binding.etApiKey.setText(config.apiKey ?: "")
-                updateConnectionStatus(config.isConnected)
+            try {
+                configManager.backendConfigFlow.collect { config ->
+                    currentConfig = config
+                    binding.etBackendUrl.setText(config.baseUrl)
+                    binding.etApiKey.setText(config.apiKey ?: "")
+                    updateConnectionStatus(config.isConnected)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                // Handle error appropriately
             }
         }
     }
@@ -119,49 +124,70 @@ class BackendConfigActivity : AppCompatActivity() {
 
         // Save configuration
         lifecycleScope.launch {
-            val newConfig = BackendConfig(
-                baseUrl = backendUrl,
-                apiKey = apiKey,
-                lastConnected = System.currentTimeMillis(),
-                isConnected = false
-            )
+            try {
+                val newConfig = BackendConfig(
+                    baseUrl = backendUrl,
+                    apiKey = apiKey,
+                    lastConnected = System.currentTimeMillis(),
+                    isConnected = false
+                )
 
-            configManager.saveBackendConfig(newConfig)
+                configManager.saveBackendConfig(newConfig)
 
-            // Update UI
-            binding.btnSave.isEnabled = true
-            binding.progressBar.visibility = View.GONE
+                // Update UI
+                binding.btnSave.isEnabled = true
+                binding.progressBar.visibility = View.GONE
 
-            Toast.makeText(
-                this@BackendConfigActivity,
-                getString(R.string.backend_saved),
-                Toast.LENGTH_SHORT
-            ).show()
+                Toast.makeText(
+                    this@BackendConfigActivity,
+                    getString(R.string.backend_saved),
+                    Toast.LENGTH_SHORT
+                ).show()
 
-            // Finish and return to main
-            finish()
+                // Finish and return to main
+                finish()
+            } catch (e: Exception) {
+                // Handle save error
+                binding.btnSave.isEnabled = true
+                binding.progressBar.visibility = View.GONE
+                
+                Toast.makeText(
+                    this@BackendConfigActivity,
+                    "Failed to save configuration: ${e.message}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
         }
     }
 
     private fun clearConfig() {
         lifecycleScope.launch {
-            configManager.clearBackendConfig()
+            try {
+                configManager.clearBackendConfig()
 
-            // Clear WebView data
-            clearWebViewData()
+                // Clear WebView data
+                clearWebViewData()
 
-            // Clear inputs
-            binding.etBackendUrl.text?.clear()
-            binding.etApiKey.text?.clear()
+                // Clear inputs
+                binding.etBackendUrl.text?.clear()
+                binding.etApiKey.text?.clear()
 
-            Toast.makeText(
-                this@BackendConfigActivity,
-                getString(R.string.backend_cleared),
-                Toast.LENGTH_SHORT
-            ).show()
+                Toast.makeText(
+                    this@BackendConfigActivity,
+                    getString(R.string.backend_cleared),
+                    Toast.LENGTH_SHORT
+                ).show()
 
-            // Finish and return to main
-            finish()
+                // Finish and return to main
+                finish()
+            } catch (e: Exception) {
+                // Handle clear error
+                Toast.makeText(
+                    this@BackendConfigActivity,
+                    "Failed to clear configuration: ${e.message}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
         }
     }
 
@@ -211,7 +237,10 @@ class BackendConfigActivity : AppCompatActivity() {
     private suspend fun testBackendConnection(url: String): Boolean {
         return try {
             // Simple HTTP GET test
-            val client = okhttp3.OkHttpClient()
+            val client = okhttp3.OkHttpClient.Builder()
+                .connectTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
+                .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                .build()
             val request = okhttp3.Request.Builder()
                 .url(url)
                 .build()
@@ -219,6 +248,7 @@ class BackendConfigActivity : AppCompatActivity() {
             val response = client.newCall(request).execute()
             response.isSuccessful
         } catch (e: Exception) {
+            e.printStackTrace()
             false
         }
     }

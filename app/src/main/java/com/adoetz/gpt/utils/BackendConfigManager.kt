@@ -30,6 +30,11 @@ class BackendConfigManager(private val context: Context) {
         private val CUSTOM_HEADERS_KEY = stringPreferencesKey("custom_headers")
     }
 
+    init {
+        // Perform migration on initialization
+        migrateFromSharedPreferences()
+    }
+
     /**
      * Get the backend configuration flow
      */
@@ -135,11 +140,22 @@ class BackendConfigManager(private val context: Context) {
     /**
      * Legacy SharedPreferences migration
      */
-    private fun migrateFromSharedPreferences(context: Context) {
+    private fun migrateFromSharedPreferences() {
         val prefs = context.getSharedPreferences("backend_config", Context.MODE_PRIVATE)
         if (prefs.contains("base_url")) {
-            // Migration happens here on first run
-            prefs.edit().clear().apply()
+            // Check if we have data to migrate
+            val baseUrl = prefs.getString("base_url", null)
+            if (baseUrl != null) {
+                // We have legacy data to migrate
+                context.backendConfigDataStore.edit { preferences ->
+                    preferences[BASE_URL_KEY] = baseUrl
+                    preferences[API_KEY_KEY] = prefs.getString("api_key", "") ?: ""
+                    preferences[LAST_CONNECTED_KEY] = prefs.getLong("last_connected", 0L).toString()
+                    preferences[IS_CONNECTED_KEY] = prefs.getBoolean("is_connected", false)
+                }
+                // Clear legacy preferences
+                prefs.edit().clear().apply()
+            }
         }
     }
 }
