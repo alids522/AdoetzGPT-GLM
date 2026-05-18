@@ -1,0 +1,9 @@
+## This file must *NOT* be checked into Version Control Systems,
+# as it contains information specific to your local configuration.
+#
+# Location of the Android SDK. This should be set to the path where your Android SDK is installed.
+# You can find this in Android Studio under File > Other Settings > Default Project Structure > SDK Location
+#
+# Example:
+# sdk.dir=/Users/yourname/Library/Android/sdk
+# sdk.dir=C:\\Users\\yourname\\AppData\\Local\\Android\\sdk

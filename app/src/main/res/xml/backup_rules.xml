@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Include WebView data -->
+    <include domain="sharedpref" path="webview_prefs.xml" />
+    <include domain="database" path="webview.db" />
+    <include domain="database" path="webviewCache.db" />
+
+    <!-- Include app data -->
+    <include domain="sharedpref" path="backend_config.xml" />
+    <include domain="file" path="datastore/" />
+
+    <!-- Exclude sensitive data -->
+    <exclude domain="sharedpref" path="device_prefs.xml" />
+</full-backup-content>
