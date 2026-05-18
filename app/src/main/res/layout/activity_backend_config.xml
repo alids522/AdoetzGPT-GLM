@@ -170,8 +170,7 @@
                 app:icon="@drawable/ic_refresh"
                 app:iconGravity="textStart"
                 app:iconTint="@color/primary"
-                app:rippleColor="@color/primary"
-                app:textColor="@color/text_primary" />
+                app:rippleColor="@color/primary" />
 
             <!-- Button Row -->
             <LinearLayout
@@ -189,8 +188,7 @@
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"
                     android:text="@string/clear"
-                    app:strokeColor="@color/error"
-                    app:textColor="@color/error" />
+                    app:strokeColor="@color/error" />
 
                 <!-- Save Button -->
                 <com.google.android.material.button.MaterialButton
