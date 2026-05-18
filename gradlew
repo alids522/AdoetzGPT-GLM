@@ -48,7 +48,7 @@
 ##############################################################################
 
 # Attempt to set APP_HOME
-
+#test
 # Resolve links: $0 may be a link
 app_path=$0
 
