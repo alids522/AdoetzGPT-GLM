@@ -28,4 +28,7 @@
     <color name="success">#FF10B981</color>
     <color name="warning">#FFF59E0B</color>
     <color name="error">#FFEF4444</color>
+
+    <!-- Launcher Icon -->
+    <color name="ic_launcher_background">#FF6366F1</color>
 </resources>

@@ -48,7 +48,6 @@
             android:launchMode="singleTask"
             android:alwaysRetainTaskState="true"
             android:documentLaunchMode="never"
-            android:resumeOverPendingNavigation="true"
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.AdoetzGPT">
             <intent-filter>
