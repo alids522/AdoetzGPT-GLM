@@ -36,3 +36,11 @@
 -keepclasseswithmembernames class * {
     native <methods>;
 }
+
+# AndroidX Startup & DataStore
+-keep public class * implements androidx.startup.Initializer
+-keep class androidx.startup.InitializationProvider { *; }
+-keep class androidx.datastore.** { *; }
+
+# Socket.io / Engine.io
+-keep class io.socket.** { *; }
