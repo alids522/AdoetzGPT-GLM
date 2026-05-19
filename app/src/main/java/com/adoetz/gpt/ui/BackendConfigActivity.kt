@@ -7,12 +7,12 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import androidx.lifecycle.lifecycleScope
 import com.adoetz.gpt.R
 import com.adoetz.gpt.databinding.ActivityBackendConfigBinding
 import com.adoetz.gpt.models.BackendConfig
 import com.adoetz.gpt.utils.BackendConfigManager
-import com.adoetz.gpt.utils.validateUrl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

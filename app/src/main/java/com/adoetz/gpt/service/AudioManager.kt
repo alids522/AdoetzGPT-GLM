@@ -148,7 +148,7 @@ class AudioManager(private val context: Context) {
 
             val bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat)
             audioRecorder = AudioRecord(
-                MediaRecorder.AudioInputSource.VOICE_RECOGNITION,
+                MediaRecorder.AudioSource.VOICE_RECOGNITION,
                 sampleRate,
                 channelConfig,
                 audioFormat,

@@ -180,8 +180,8 @@ class MainActivity : AppCompatActivity() {
                 allowContentAccess = true
 
                 // Third-party cookies
-                cookieManager = CookieManager.getInstance().apply {
-                    setAcceptThirdPartyCookies(this@apply, true)
+                CookieManager.getInstance().apply {
+                    setAcceptThirdPartyCookies(binding.webView, true)
                     setAcceptCookie(true)
                 }
 
@@ -444,7 +444,7 @@ class MainActivity : AppCompatActivity() {
         webView = null
 
         // Unbind from voice service safely
-        if (isVoiceServiceBound && ::serviceConnection.isInitialized) {
+        if (isVoiceServiceBound) {
             unbindService(serviceConnection)
             isVoiceServiceBound = false
         }

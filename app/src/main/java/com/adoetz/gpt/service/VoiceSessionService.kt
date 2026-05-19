@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
 import androidx.core.app.NotificationCompat
+import com.adoetz.gpt.R
 import com.adoetz.gpt.models.VoiceSessionData
 import com.adoetz.gpt.models.VoiceSessionState
 import kotlinx.coroutines.*
@@ -23,15 +24,15 @@ import kotlinx.coroutines.flow.asStateFlow
 class VoiceSessionService : Service() {
 
     companion object {
-        private const val TAG = "VoiceSessionService"
-        private const val NOTIFICATION_ID = 1001
-        private const val CHANNEL_ID = "voice_session_channel"
-        private const val ACTION_START = "com.adoetz.gpt.action.START_SESSION"
-        private const val ACTION_STOP = "com.adoetz.gpt.action.STOP_SESSION"
-        private const val ACTION_UPDATE_STATE = "com.adoetz.gpt.action.UPDATE_STATE"
-        private const val EXTRA_STATE = "extra_state"
-        private const val EXTRA_SESSION_ID = "extra_session_id"
-        private const val EXTRA_ERROR_MESSAGE = "extra_error_message"
+        const val TAG = "VoiceSessionService"
+        const val NOTIFICATION_ID = 1001
+        const val CHANNEL_ID = "voice_session_channel"
+        const val ACTION_START = "com.adoetz.gpt.action.START_SESSION"
+        const val ACTION_STOP = "com.adoetz.gpt.action.STOP_SESSION"
+        const val ACTION_UPDATE_STATE = "com.adoetz.gpt.action.UPDATE_STATE"
+        const val EXTRA_STATE = "extra_state"
+        const val EXTRA_SESSION_ID = "extra_session_id"
+        const val EXTRA_ERROR_MESSAGE = "extra_error_message"
 
         fun startSession(context: Context, sessionId: String? = null) {
             val intent = Intent(context, VoiceSessionService::class.java).apply {

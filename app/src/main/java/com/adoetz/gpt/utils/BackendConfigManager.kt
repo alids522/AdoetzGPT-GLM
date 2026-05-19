@@ -10,9 +10,12 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.adoetz.gpt.models.BackendConfig
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 /**
  * Manager for backend configuration using DataStore
@@ -138,14 +141,16 @@ class BackendConfigManager(private val context: Context) {
             val baseUrl = prefs.getString("base_url", null)
             if (baseUrl != null) {
                 // We have legacy data to migrate
-                context.backendConfigDataStore.edit { preferences ->
-                    preferences[BASE_URL_KEY] = baseUrl
-                    preferences[API_KEY_KEY] = prefs.getString("api_key", "") ?: ""
-                    preferences[LAST_CONNECTED_KEY] = prefs.getLong("last_connected", 0L).toString()
-                    preferences[IS_CONNECTED_KEY] = prefs.getBoolean("is_connected", false)
+                CoroutineScope(Dispatchers.IO).launch {
+                    context.backendConfigDataStore.edit { preferences ->
+                        preferences[BASE_URL_KEY] = baseUrl
+                        preferences[API_KEY_KEY] = prefs.getString("api_key", "") ?: ""
+                        preferences[LAST_CONNECTED_KEY] = prefs.getLong("last_connected", 0L).toString()
+                        preferences[IS_CONNECTED_KEY] = prefs.getBoolean("is_connected", false)
+                    }
+                    // Clear legacy preferences
+                    prefs.edit().clear().apply()
                 }
-                // Clear legacy preferences
-                prefs.edit().clear().apply()
             }
         }
     }
