@@ -1,3 +1,4 @@
+--- .gitignore (原始)
 # Built application files
 *.apk
 *.aar
@@ -95,3 +96,35 @@ lint/baseline.xml
 .Trashes
 ehthumbs.db
 Thumbs.db
+
++++ .gitignore (修改后)
+```
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Android
+*.apk
+*.aar
+*.dex
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# Temp files
+*.tmp
+*.temp
+*~
+
+# Logs
+*.log
+
+# Local configuration
+local.properties
+.settings/
+```
