@@ -1,11 +1,8 @@
 package com.adoetz.gpt.models
 
-import kotlinx.serialization.Serializable
-
 /**
  * Voice session state model
  */
-@Serializable
 enum class VoiceSessionState {
     IDLE,
     STARTING,
@@ -19,7 +16,6 @@ enum class VoiceSessionState {
 /**
  * Voice session data model
  */
-@Serializable
 data class VoiceSessionData(
     val state: VoiceSessionState = VoiceSessionState.IDLE,
     val sessionId: String? = null,

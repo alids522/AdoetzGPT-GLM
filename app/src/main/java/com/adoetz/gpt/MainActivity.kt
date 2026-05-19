@@ -1,12 +1,16 @@
 package com.adoetz.gpt
 
+import android.Manifest
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.animation.LinearInterpolator
 import android.webkit.*
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -38,6 +42,19 @@ class MainActivity : AppCompatActivity() {
     private var voiceServiceBinder: VoiceSessionService.LocalBinder? = null
     private var isVoiceServiceBound = false
 
+    // Permission request launcher
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val audioGranted = permissions[Manifest.permission.RECORD_AUDIO] ?: false
+            if (!audioGranted) {
+                Toast.makeText(
+                    this,
+                    "Microphone permission is required for voice sessions",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+
     private val backendConfigLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
@@ -61,11 +78,18 @@ class MainActivity : AppCompatActivity() {
 
         configManager = BackendConfigManager(this)
 
-        setupViews()
+        setupViews(savedInstanceState)
         loadBackendConfig()
+
+        // Bind to voice service
+        val serviceIntent = Intent(this, VoiceSessionService::class.java)
+        bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+
+        // Check and request runtime permissions
+        checkAndRequestPermissions()
     }
 
-    private fun setupViews() {
+    private fun setupViews(savedInstanceState: Bundle?) {
         binding.btnConfigureBackend.setOnClickListener {
             openBackendConfig()
         }
@@ -77,6 +101,26 @@ class MainActivity : AppCompatActivity() {
         // Restore WebView if saved
         if (savedInstanceState != null) {
             restoreWebView(savedInstanceState)
+        }
+    }
+
+    private fun checkAndRequestPermissions() {
+        val permissionsToRequest = mutableListOf<String>()
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+            != PackageManager.PERMISSION_GRANTED) {
+            permissionsToRequest.add(Manifest.permission.RECORD_AUDIO)
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+
+        if (permissionsToRequest.isNotEmpty()) {
+            requestPermissionLauncher.launch(permissionsToRequest.toTypedArray())
         }
     }
 

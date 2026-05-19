@@ -3,6 +3,7 @@ package com.adoetz.gpt.service
 import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.graphics.Color
 import android.os.Binder
 import android.os.Build
@@ -23,15 +24,15 @@ import kotlinx.coroutines.flow.asStateFlow
 class VoiceSessionService : Service() {
 
     companion object {
-        private const val TAG = "VoiceSessionService"
-        private const val NOTIFICATION_ID = 1001
-        private const val CHANNEL_ID = "voice_session_channel"
-        private const val ACTION_START = "com.adoetz.gpt.action.START_SESSION"
-        private const val ACTION_STOP = "com.adoetz.gpt.action.STOP_SESSION"
-        private const val ACTION_UPDATE_STATE = "com.adoetz.gpt.action.UPDATE_STATE"
-        private const val EXTRA_STATE = "extra_state"
-        private const val EXTRA_SESSION_ID = "extra_session_id"
-        private const val EXTRA_ERROR_MESSAGE = "extra_error_message"
+        const val TAG = "VoiceSessionService"
+        const val NOTIFICATION_ID = 1001
+        const val CHANNEL_ID = "voice_session_channel"
+        const val ACTION_START = "com.adoetz.gpt.action.START_SESSION"
+        const val ACTION_STOP = "com.adoetz.gpt.action.STOP_SESSION"
+        const val ACTION_UPDATE_STATE = "com.adoetz.gpt.action.UPDATE_STATE"
+        const val EXTRA_STATE = "extra_state"
+        const val EXTRA_SESSION_ID = "extra_session_id"
+        const val EXTRA_ERROR_MESSAGE = "extra_error_message"
 
         fun startSession(context: Context, sessionId: String? = null) {
             val intent = Intent(context, VoiceSessionService::class.java).apply {
@@ -136,7 +137,11 @@ class VoiceSessionService : Service() {
         // Start foreground with notification
         if (!isForeground) {
             val notification = createNotification(_sessionState.value)
-            startForeground(NOTIFICATION_ID, notification)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE)
+            } else {
+                startForeground(NOTIFICATION_ID, notification)
+            }
             isForeground = true
         }
 

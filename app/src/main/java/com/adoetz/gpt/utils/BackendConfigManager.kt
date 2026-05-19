@@ -11,6 +11,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.adoetz.gpt.models.BackendConfig
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 /**
@@ -47,12 +48,7 @@ class BackendConfigManager(private val context: Context) {
      * Get the current backend configuration (synchronous)
      */
     suspend fun getBackendConfig(): BackendConfig {
-        var result = BackendConfig()
-        backendConfigFlow.collect { config ->
-            result = config
-            return@collect
-        }
-        return result
+        return backendConfigFlow.first()
     }
 
     /**
@@ -109,12 +105,7 @@ class BackendConfigManager(private val context: Context) {
      * Check if backend is configured
      */
     suspend fun isBackendConfigured(): Boolean {
-        var config = BackendConfig()
-        backendConfigFlow.collect { cfg ->
-            config = cfg
-            return@collect
-        }
-        return config.isValid()
+        return backendConfigFlow.first().isValid()
     }
 
     /**

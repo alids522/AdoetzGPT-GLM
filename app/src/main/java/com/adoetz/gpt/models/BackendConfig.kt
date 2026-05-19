@@ -1,11 +1,8 @@
 package com.adoetz.gpt.models
 
-import kotlinx.serialization.Serializable
-
 /**
  * Data model representing the backend configuration
  */
-@Serializable
 data class BackendConfig(
     val baseUrl: String = "",
     val apiKey: String? = null,

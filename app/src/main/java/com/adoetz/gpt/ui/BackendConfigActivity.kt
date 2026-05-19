@@ -13,7 +13,9 @@ import com.adoetz.gpt.databinding.ActivityBackendConfigBinding
 import com.adoetz.gpt.models.BackendConfig
 import com.adoetz.gpt.utils.BackendConfigManager
 import com.adoetz.gpt.utils.validateUrl
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Activity for configuring the backend connection
@@ -208,8 +210,8 @@ class BackendConfigActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun testBackendConnection(url: String): Boolean {
-        return try {
+    private suspend fun testBackendConnection(url: String): Boolean = withContext(Dispatchers.IO) {
+        try {
             // Simple HTTP GET test
             val client = okhttp3.OkHttpClient()
             val request = okhttp3.Request.Builder()
